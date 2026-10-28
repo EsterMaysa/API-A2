@@ -1,3 +1,4 @@
+const { errorHandler } = require('./middlewares/errorHandler');
 const express = require('express');
 const pedidoRoutes = require('./routes/pedidoRoutes');
 
@@ -12,13 +13,17 @@ app.use((req, res) => {
   res.status(404).json({ erro: 'Rota não encontrada.' });
 });
 
-// Tratamento de erros inesperados e JSON inválido.
+
+app.listen(PORT, function () {
+  console.log('Servidor rodando na porta ' + PORT);
+});
+
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
     return res.status(400).json({ erro: 'JSON inválido.' });
   }
-  console.error('Erro inesperado:', err);
-  return res.status(500).json({ erro: 'Erro interno do servidor.' });
+
+  return errorHandler(err, req, res, next);
 });
 
 app.listen(PORT, function () {
@@ -26,3 +31,4 @@ app.listen(PORT, function () {
 });
 
 module.exports = app;
+
